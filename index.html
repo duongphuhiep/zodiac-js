@@ -1,0 +1,146 @@
+﻿<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>What is your Zodiac Sign</title>
+
+	<style>
+		.panel {
+			float:left;
+			padding: 20px;
+			margin: 5px;
+		}
+		.highlight {
+			font-weight: bold;
+		}
+		.desc {
+			padding: 5px;
+			margin-bottom: 10px;
+		}
+	</style>
+
+	<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+	<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+	<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+	<script src="date.format.js"></script>
+
+	<script>
+
+		var H = {} /*create new namespace*/
+		
+		H.onDateSelected = function(datetext, instance)
+	    {
+			var chosenDate = $(this).datepicker("getDate");
+			var formattedChosenDate = chosenDate.format('mmdd');
+			var hsign = H.getSign(formattedChosenDate);
+
+			$("#panelResult").show();
+	    	$("#chosenDate").text(chosenDate.format("dd/mm"));
+	    	H.displaySign(hsign);
+	    }
+	
+	    H.displaySign = function(hsign /*raw's inner-object*/) {
+	    	$("#signName").text(hsign.name);
+	    	$("#signCode").text(hsign.code);
+	    	$("#signSys").text(hsign.sys);
+	    	$("#signSpe").text(hsign.spe);
+
+	    	$("#sys_desc").text(H.sys_desc[hsign.sys]);
+	    	$("#spe_desc").text(H.spe_desc[hsign.spe]);
+
+	    	$("#icon").attr("src", "img/"+hsign.code+".jpg");
+	    }
+
+		H.raw = [
+				{code: "Aquarius",		name:"Bảo Bình",	start:"0120", 	sys:"Khí",	spe:"Thống Lĩnh"	},
+				{code: "Pisces",		name:"Song Ngư",	start:"0219", 	sys:"Thủy",	spe:"Biến Đổi"		},
+				{code: "Aries",			name:"Bạch Dương",	start:"0321",	sys:"Hỏa",	spe:"Thống Lĩnh"	},
+				{code: "Taurus",		name:"Kim Ngưu",	start:"0420", 	sys:"Thổ",	spe:"Kiên Định"		},
+				{code: "Gemini",		name:"Song Tử",		start:"0521", 	sys:"Khí",	spe:"Biến Đổi"		},
+				{code: "Cancer",		name:"Cự Giải",		start:"0622", 	sys:"Thủy",	spe:"Thống Lĩnh"	},
+				{code: "Leo",			name:"Sư tử",		start:"0723", 	sys:"Hỏa",	spe:"Kiên Định"		},
+				{code: "Virgo",			name:"Xử Nữ",		start:"0823", 	sys:"Thổ",	spe:"Biến Đổi"		},
+				{code: "Libra",			name:"Thiên Bình",	start:"0923", 	sys:"Khí",	spe:"Kiên Định"		},
+				{code: "Scorpio",		name:"Bọ Cạp",		start:"1024", 	sys:"Thủy",	spe:"Kiên Định"		},
+				{code: "Sagittarius",	name:"Nhân Mã",		start:"1122", 	sys:"Hỏa",	spe:"Biến Đổi"		},
+				{code: "Capricomus",	name:"Ma Kết",		start:"1222", 	sys:"Thổ",	spe:"Thống Lĩnh"	}
+			];
+		
+		H.sys_desc = {
+			"Thổ": "Chung thuỷ, chăm chỉ, làm việc chắc chắn.",
+			"Hỏa": "Nhiệt tình, Gan dạ, Sôi nổi",
+			"Thủy": "Nhạy cảm, Giàu tình cảm, Dễ bị tổn thương",
+			"Khí": "Thông minh, Yêu tự do, tính tình phóng khoáng, cởi mở"
+		};
+
+		H.spe_desc = {
+			"Thống Lĩnh": "Tham vọng nhưng Độc đoán",
+			"Kiên Định": "Quả quyết nhưng Ương bướng",
+			"Biến Đổi": "Dễ thích nghi nhưng hay thay đổi, không ổn định"
+		};
+		
+		H.getSign = function(datetext /*String*/)
+		{
+			for (var i=0; i<11; i++) {
+				var startDate = H.raw[i].start;
+				var endDateEx = H.raw[i+1].start;
+				if (startDate<=datetext && datetext<endDateEx) {
+					return H.raw[i];
+				}
+			}
+
+			/* check if dateText fall bettween 22/12 - 19/1 then return Capricomus */
+			
+			var capricomusStartDate = H.raw[11].start;
+			var aquariusStartDate = H.raw[0].start;
+			var endOfYear = "1231";
+			var startOfYear = "0101";
+
+			if (capricomusStartDate<=datetext && datetext<=endOfYear || startOfYear<=datetext && datetext<aquariusStartDate) {
+				return H.raw[11];
+			}
+
+			throw "No sign found for '"+datetext+"'";
+		}
+
+		$(document).ready( function() 
+		{
+			$( "#datepicker" ).datepicker({
+				changeMonth: true,
+	      		changeYear: true,
+	      		showButtonPanel: true,
+	      		showWeek: true,
+	      		onSelect: H.onDateSelected
+      		});
+
+      		$("#panelResult").hide();
+
+	 	});
+		
+	</script>
+</head>
+<body>
+
+	<div class="panel">
+		Chọn Sinh Nhật của bạn (Năm không quan trọng) 
+		<br>&nbsp;</br>
+		<div type="text" id="datepicker"></div>
+	</div>
+
+	<div class="panel" id="panelResult">
+		You selected <span id="chosenDate"></span> ~ <span id="signCode"></span>
+		<h1 id="signName"></h1>
+		<ul>
+			<li>Nhóm <span class='highlight' id="signSys"></span>:</li>
+			<div class="desc" id="sys_desc"></div>
+
+			<li>Hệ <span class='highlight' id="signSpe"></span>:</li>
+			<div class="desc" id="spe_desc"></div>
+		</ul>
+
+		<img id="icon">
+	</div>
+
+
+</body>
+</html>
